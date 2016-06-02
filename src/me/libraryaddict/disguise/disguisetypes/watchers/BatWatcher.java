@@ -10,7 +10,7 @@ public class BatWatcher extends LivingWatcher {
     }
 
     public boolean isHanging() {
-        return ((byte)getValue(11, (byte) 1)) == 1;
+        return ((byte) getValue(11, (byte) 1)) == 1;
     }
 
     public void setHanging(boolean hanging) {

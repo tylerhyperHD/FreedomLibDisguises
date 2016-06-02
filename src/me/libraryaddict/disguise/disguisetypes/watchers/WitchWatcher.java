@@ -11,7 +11,6 @@ public class WitchWatcher extends LivingWatcher {
         super(disguise);
     }
 
-
     public boolean isAggressive() {
         return (boolean) getValue(11, false);
     }

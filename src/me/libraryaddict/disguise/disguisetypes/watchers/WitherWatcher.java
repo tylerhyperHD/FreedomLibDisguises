@@ -14,6 +14,7 @@ public class WitherWatcher extends LivingWatcher {
 
     /**
      * Returns the amount of time this Wither is invulnerable for
+     *
      * @return
      */
     public int getInvulnerability() {

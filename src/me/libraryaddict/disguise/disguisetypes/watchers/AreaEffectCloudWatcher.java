@@ -46,5 +46,4 @@ public class AreaEffectCloudWatcher extends FlagWatcher {
         setValue(8, particleId);
     }
 
-
 }

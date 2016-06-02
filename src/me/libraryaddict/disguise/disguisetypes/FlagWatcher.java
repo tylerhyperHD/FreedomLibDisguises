@@ -25,8 +25,7 @@ import me.libraryaddict.disguise.utilities.DisguiseUtilities;
 import me.libraryaddict.disguise.utilities.PacketsManager;
 import me.libraryaddict.disguise.utilities.ReflectionManager;
 
-public class FlagWatcher
-{
+public class FlagWatcher {
 
     private boolean addEntityAnimations = DisguiseConfig.isEntityAnimationsAdded();
     /**
@@ -40,20 +39,16 @@ public class FlagWatcher
     private HashSet<Integer> modifiedEntityAnimations = new HashSet<>();
     private List<WrappedWatchableObject> watchableObjects;
 
-    public FlagWatcher(Disguise disguise)
-    {
+    public FlagWatcher(Disguise disguise) {
         this.disguise = (TargetedDisguise) disguise;
         equipment = ReflectionManager.createEntityEquipment(disguise.getEntity());
     }
 
-    private byte addEntityAnimations(byte originalValue, byte entityValue)
-    {
+    private byte addEntityAnimations(byte originalValue, byte entityValue) {
         byte valueByte = originalValue;
 
-        for (int i = 0; i < 6; i++)
-        {
-            if ((entityValue & 1 << i) != 0 && !modifiedEntityAnimations.contains(i))
-            {
+        for (int i = 0; i < 6; i++) {
+            if ((entityValue & 1 << i) != 0 && !modifiedEntityAnimations.contains(i)) {
                 valueByte = (byte) (valueByte | 1 << i);
             }
         }
@@ -63,16 +58,12 @@ public class FlagWatcher
         return originalValue;
     }
 
-    public FlagWatcher clone(Disguise owningDisguise)
-    {
+    public FlagWatcher clone(Disguise owningDisguise) {
         FlagWatcher cloned;
 
-        try
-        {
+        try {
             cloned = getClass().getConstructor(Disguise.class).newInstance(getDisguise());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace(System.out);
             cloned = new FlagWatcher(getDisguise());
         }
@@ -85,49 +76,39 @@ public class FlagWatcher
         return cloned;
     }
 
-    public List<WrappedWatchableObject> convert(List<WrappedWatchableObject> list)
-    {
+    public List<WrappedWatchableObject> convert(List<WrappedWatchableObject> list) {
         List<WrappedWatchableObject> newList = new ArrayList<>();
         HashSet<Integer> sentValues = new HashSet<>();
         boolean sendAllCustom = false;
 
-        for (WrappedWatchableObject watch : list)
-        {
+        for (WrappedWatchableObject watch : list) {
             int id = watch.getIndex();
             sentValues.add(id);
 
             // Its sending the air metadata. This is the least commonly sent metadata which all entitys still share.
             // I send my custom values if I see this!
-            if (id == 1)
-            {
+            if (id == 1) {
                 sendAllCustom = true;
             }
 
             Object value = null;
 
-            if (entityValues.containsKey(id))
-            {
-                if (entityValues.get(id) == null)
-                {
+            if (entityValues.containsKey(id)) {
+                if (entityValues.get(id) == null) {
                     continue;
                 }
 
                 value = entityValues.get(id);
-            }
-            else if (backupEntityValues.containsKey(id))
-            {
-                if (backupEntityValues.get(id) == null)
-                {
+            } else if (backupEntityValues.containsKey(id)) {
+                if (backupEntityValues.get(id) == null) {
                     continue;
                 }
 
                 value = backupEntityValues.get(id);
             }
 
-            if (value != null)
-            {
-                if (isEntityAnimationsAdded() && id == 0)
-                {
+            if (value != null) {
+                if (isEntityAnimationsAdded() && id == 0) {
                     value = this.addEntityAnimations((byte) value, (byte) watch.getValue());
                 }
 
@@ -135,19 +116,15 @@ public class FlagWatcher
 
                 watch = new WrappedWatchableObject(ReflectionManager.createDataWatcherItem(id, value));
 
-                if (!isDirty)
-                {
+                if (!isDirty) {
                     watch.setDirtyState(false);
                 }
-            }
-            else
-            {
+            } else {
                 boolean isDirty = watch.getDirtyState();
 
                 watch = new WrappedWatchableObject(ReflectionManager.createDataWatcherItem(id, watch.getValue()));
 
-                if (!isDirty)
-                {
+                if (!isDirty) {
                     watch.setDirtyState(false);
                 }
             }
@@ -155,20 +132,16 @@ public class FlagWatcher
             newList.add(watch);
         }
 
-        if (sendAllCustom)
-        {
+        if (sendAllCustom) {
             // Its sending the entire meta data. Better add the custom meta
-            for (int id : entityValues.keySet())
-            {
-                if (sentValues.contains(id))
-                {
+            for (int id : entityValues.keySet()) {
+                if (sentValues.contains(id)) {
                     continue;
                 }
 
                 Object value = entityValues.get(id);
 
-                if (value == null)
-                {
+                if (value == null) {
                     continue;
                 }
 
@@ -179,26 +152,19 @@ public class FlagWatcher
         }
         // Here we check for if there is a health packet that says they died.
         if (getDisguise().isSelfDisguiseVisible() && getDisguise().getEntity() != null
-                && getDisguise().getEntity() instanceof Player)
-        {
-            for (WrappedWatchableObject watch : newList)
-            {
+                && getDisguise().getEntity() instanceof Player) {
+            for (WrappedWatchableObject watch : newList) {
                 // Its a health packet
-                if (watch.getIndex() == 6)
-                {
+                if (watch.getIndex() == 6) {
                     Object value = watch.getValue();
 
-                    if (value != null && value instanceof Float)
-                    {
+                    if (value != null && value instanceof Float) {
                         float newHealth = (Float) value;
 
-                        if (newHealth > 0 && hasDied)
-                        {
+                        if (newHealth > 0 && hasDied) {
                             hasDied = false;
                             DisguiseUtilities.sendSelfDisguise((Player) getDisguise().getEntity(), disguise);
-                        }
-                        else if (newHealth <= 0 && !hasDied)
-                        {
+                        } else if (newHealth <= 0 && !hasDied) {
                             hasDied = true;
                         }
                     }
@@ -209,171 +175,139 @@ public class FlagWatcher
         return newList;
     }
 
-    public ItemStack[] getArmor()
-    {
+    public ItemStack[] getArmor() {
         ItemStack[] armor = new ItemStack[4];
         System.arraycopy(armor, 0, armor, 0, 4);
 
         return armor;
     }
 
-    public String getCustomName()
-    {
+    public String getCustomName() {
         return (String) getValue(2, null);
     }
 
-    protected TargetedDisguise getDisguise()
-    {
+    protected TargetedDisguise getDisguise() {
         return disguise;
     }
 
-    private boolean getEntityFlag(int byteValue)
-    {
+    private boolean getEntityFlag(int byteValue) {
         return ((byte) getValue(0, (byte) 0) & 1 << byteValue) != 0;
     }
 
-    public ItemStack getItemInMainHand()
-    {
-        if (equipment == null)
+    public ItemStack getItemInMainHand() {
+        if (equipment == null) {
             return null;
+        }
 
         return equipment.getItemInMainHand();
     }
 
-    public ItemStack getItemInOffHand()
-    {
-        if (equipment == null)
+    public ItemStack getItemInOffHand() {
+        if (equipment == null) {
             return null;
+        }
 
         return equipment.getItemInOffHand();
     }
 
-    public EntityEquipment getEquipment()
-    {
+    public EntityEquipment getEquipment() {
         return equipment;
     }
 
-    protected <Y> Y getValue(int no, Y backup)
-    {
-        if (entityValues.containsKey(no))
-        {
+    protected <Y> Y getValue(int no, Y backup) {
+        if (entityValues.containsKey(no)) {
             return (Y) entityValues.get(no);
         }
 
         return backup;
     }
 
-    public List<WrappedWatchableObject> getWatchableObjects()
-    {
-        if (watchableObjects == null)
-        {
+    public List<WrappedWatchableObject> getWatchableObjects() {
+        if (watchableObjects == null) {
             rebuildWatchableObjects();
         }
 
         return watchableObjects;
     }
 
-    public boolean hasCustomName()
-    {
+    public boolean hasCustomName() {
         return getCustomName() != null;
     }
 
-    protected boolean hasValue(int no)
-    {
+    protected boolean hasValue(int no) {
         return entityValues.containsKey(no);
     }
 
-    public boolean isCustomNameVisible()
-    {
+    public boolean isCustomNameVisible() {
         return (boolean) getValue(3, false);
     }
 
-    public boolean isEntityAnimationsAdded()
-    {
+    public boolean isEntityAnimationsAdded() {
         return addEntityAnimations;
     }
 
-    public boolean isBurning()
-    {
+    public boolean isBurning() {
         return getEntityFlag(0);
     }
 
-    public boolean isSneaking()
-    {
+    public boolean isSneaking() {
         return getEntityFlag(1);
     }
 
-    public boolean isSprinting()
-    {
+    public boolean isSprinting() {
         return getEntityFlag(3);
     }
 
-    public boolean isRightClicking()
-    {
+    public boolean isRightClicking() {
         return getEntityFlag(4);
     }
 
-    public boolean isInvisible()
-    {
+    public boolean isInvisible() {
         return getEntityFlag(5);
     }
 
-    public boolean isGlowing()
-    {
+    public boolean isGlowing() {
         return getEntityFlag(6);
     }
 
-    public boolean isFlyingWithElytra()
-    {
+    public boolean isFlyingWithElytra() {
         return getEntityFlag(7);
     }
 
-    public void rebuildWatchableObjects()
-    {
+    public void rebuildWatchableObjects() {
         watchableObjects = new ArrayList<>();
 
-        for (int i = 0; i <= 31; i++)
-        {
+        for (int i = 0; i <= 31; i++) {
             WrappedWatchableObject watchable = null;
 
-            if (this.entityValues.containsKey(i) && this.entityValues.get(i) != null)
-            {
+            if (this.entityValues.containsKey(i) && this.entityValues.get(i) != null) {
                 watchable = new WrappedWatchableObject(ReflectionManager.createDataWatcherItem(i, entityValues.get(i)));
-            }
-            else if (this.backupEntityValues.containsKey(i) && this.backupEntityValues.get(i) != null)
-            {
+            } else if (this.backupEntityValues.containsKey(i) && this.backupEntityValues.get(i) != null) {
                 watchable = new WrappedWatchableObject(ReflectionManager.createDataWatcherItem(i, entityValues.get(i)));
             }
 
-            if (watchable != null)
-            {
+            if (watchable != null) {
                 watchableObjects.add(watchable);
             }
         }
     }
 
-    protected void sendData(int... dataValues)
-    {
-        if (!DisguiseAPI.isDisguiseInUse(getDisguise()) || getDisguise().getWatcher() != this)
-        {
+    protected void sendData(int... dataValues) {
+        if (!DisguiseAPI.isDisguiseInUse(getDisguise()) || getDisguise().getWatcher() != this) {
             return;
         }
 
         List<WrappedWatchableObject> list = new ArrayList<>();
 
-        for (int data : dataValues)
-        {
-            if (!entityValues.containsKey(data) || entityValues.get(data) == null)
-            {
+        for (int data : dataValues) {
+            if (!entityValues.containsKey(data) || entityValues.get(data) == null) {
                 continue;
             }
 
             Object value = entityValues.get(data);
 
-            if (isEntityAnimationsAdded() && DisguiseConfig.isMetadataPacketsEnabled() && data == 0)
-            {
-                if (!PacketsManager.isStaticMetadataDisguiseType(disguise))
-                {
+            if (isEntityAnimationsAdded() && DisguiseConfig.isMetadataPacketsEnabled() && data == 0) {
+                if (!PacketsManager.isStaticMetadataDisguiseType(disguise)) {
                     value = addEntityAnimations((byte) value,
                             WrappedDataWatcher.getEntityWatcher(disguise.getEntity()).getByte(0));
                 }
@@ -384,8 +318,7 @@ public class FlagWatcher
             list.add(watch);
         }
 
-        if (!list.isEmpty())
-        {
+        if (!list.isEmpty()) {
             PacketContainer packet = new PacketContainer(Server.ENTITY_METADATA);
 
             StructureModifier<Object> mods = packet.getModifier();
@@ -393,49 +326,39 @@ public class FlagWatcher
 
             packet.getWatchableCollectionModifier().write(0, list);
 
-            for (Player player : DisguiseUtilities.getPerverts(getDisguise()))
-            {
-                try
-                {
+            for (Player player : DisguiseUtilities.getPerverts(getDisguise())) {
+                try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-                }
-                catch (InvocationTargetException e)
-                {
+                } catch (InvocationTargetException e) {
                     e.printStackTrace(System.out);
                 }
             }
         }
     }
 
-    public void setAddEntityAnimations(boolean isEntityAnimationsAdded)
-    {
+    public void setAddEntityAnimations(boolean isEntityAnimationsAdded) {
         this.addEntityAnimations = isEntityAnimationsAdded;
     }
 
-    public void setArmor(ItemStack[] itemstack)
-    {
+    public void setArmor(ItemStack[] itemstack) {
         setItemStack(EquipmentSlot.HEAD, itemstack[0]);
         setItemStack(EquipmentSlot.CHEST, itemstack[1]);
         setItemStack(EquipmentSlot.LEGS, itemstack[2]);
         setItemStack(EquipmentSlot.FEET, itemstack[3]);
     }
 
-    protected void setBackupValue(int no, Object value)
-    {
+    protected void setBackupValue(int no, Object value) {
         backupEntityValues.put(no, value);
     }
 
-    public void setBurning(boolean setBurning)
-    {
+    public void setBurning(boolean setBurning) {
         setEntityFlag(0, setBurning);
 
         sendData(0);
     }
 
-    public void setCustomName(String name)
-    {
-        if (name != null && name.length() > 64)
-        {
+    public void setCustomName(String name) {
+        if (name != null && name.length() > 64) {
             name = name.substring(0, 64);
         }
 
@@ -443,42 +366,34 @@ public class FlagWatcher
         sendData(2);
     }
 
-    public void setCustomNameVisible(boolean display)
-    {
+    public void setCustomNameVisible(boolean display) {
         setValue(3, display);
         sendData(3);
     }
 
-    private void setEntityFlag(int byteValue, boolean flag)
-    {
+    private void setEntityFlag(int byteValue, boolean flag) {
         modifiedEntityAnimations.add(byteValue);
 
         byte b0 = (byte) getValue(0, (byte) 0);
 
-        if (flag)
-        {
+        if (flag) {
             setValue(0, (byte) (b0 | 1 << byteValue));
-        }
-        else
-        {
+        } else {
             setValue(0, (byte) (b0 & ~(1 << byteValue)));
         }
     }
 
-    public void setInvisible(boolean setInvis)
-    {
+    public void setInvisible(boolean setInvis) {
         setEntityFlag(5, setInvis);
         sendData(0);
     }
 
-    public void setGlowing(boolean glowing)
-    {
+    public void setGlowing(boolean glowing) {
         setEntityFlag(6, glowing);
         sendData(0);
     }
 
-    public void setFlyingWithElytra(boolean flying)
-    {
+    public void setFlyingWithElytra(boolean flying) {
         setEntityFlag(7, flying);
         sendData(0);
     }
@@ -489,32 +404,27 @@ public class FlagWatcher
      * @param itemstack
      */
     @Deprecated
-    public void setItemInHand(ItemStack itemstack)
-    {
+    public void setItemInHand(ItemStack itemstack) {
         setItemInMainHand(itemstack);
     }
 
-    public void setItemInMainHand(ItemStack itemstack)
-    {
+    public void setItemInMainHand(ItemStack itemstack) {
         setItemStack(EquipmentSlot.HAND, itemstack);
     }
 
-    public void setItemInOffHand(ItemStack itemstack)
-    {
+    public void setItemInOffHand(ItemStack itemstack) {
         setItemStack(EquipmentSlot.OFF_HAND, itemstack);
     }
 
-    public void setItemStack(EquipmentSlot slot, ItemStack itemStack)
-    {
-        if (equipment == null)
+    public void setItemStack(EquipmentSlot slot, ItemStack itemStack) {
+        if (equipment == null) {
             return;
+        }
 
         // Itemstack which is null means that its not replacing the disguises itemstack.
-        if (itemStack == null)
-        {
+        if (itemStack == null) {
             // Find the item to replace it with
-            if (getDisguise().getEntity() instanceof LivingEntity)
-            {
+            if (getDisguise().getEntity() instanceof LivingEntity) {
                 EntityEquipment equipment = ((LivingEntity) getDisguise().getEntity()).getEquipment();
                 setItemStack(equipment, slot, itemStack);
             }
@@ -522,15 +432,13 @@ public class FlagWatcher
 
         Object itemToSend = null;
 
-        if (itemStack != null && itemStack.getTypeId() != 0)
-        {
+        if (itemStack != null && itemStack.getTypeId() != 0) {
             itemToSend = ReflectionManager.getNmsItem(itemStack);
         }
 
         setItemStack(equipment, slot, itemStack);
 
-        if (DisguiseAPI.isDisguiseInUse(getDisguise()) && getDisguise().getWatcher() == this)
-        {
+        if (DisguiseAPI.isDisguiseInUse(getDisguise()) && getDisguise().getWatcher() == this) {
             PacketContainer packet = new PacketContainer(Server.ENTITY_EQUIPMENT);
 
             StructureModifier<Object> mods = packet.getModifier();
@@ -539,96 +447,85 @@ public class FlagWatcher
             mods.write(1, ReflectionManager.createEnumItemSlot(slot));
             mods.write(2, itemToSend);
 
-            for (Player player : DisguiseUtilities.getPerverts(getDisguise()))
-            {
-                try
-                {
+            for (Player player : DisguiseUtilities.getPerverts(getDisguise())) {
+                try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-                }
-                catch (InvocationTargetException e)
-                {
+                } catch (InvocationTargetException e) {
                     e.printStackTrace(System.out);
                 }
             }
         }
     }
 
-    private void setItemStack(EntityEquipment equipment, EquipmentSlot slot, ItemStack itemStack)
-    {
-        if (equipment == null)
+    private void setItemStack(EntityEquipment equipment, EquipmentSlot slot, ItemStack itemStack) {
+        if (equipment == null) {
             return;
+        }
 
-        switch (slot)
-        {
-        case CHEST:
-            equipment.setChestplate(itemStack);
-            break;
-        case FEET:
-            equipment.setBoots(itemStack);
-            break;
-        case HAND:
-            equipment.setItemInMainHand(itemStack);
-            break;
-        case HEAD:
-            equipment.setHelmet(itemStack);
-            break;
-        case LEGS:
-            equipment.setLeggings(itemStack);
-            break;
-        case OFF_HAND:
-            equipment.setItemInOffHand(itemStack);
-            break;
+        switch (slot) {
+            case CHEST:
+                equipment.setChestplate(itemStack);
+                break;
+            case FEET:
+                equipment.setBoots(itemStack);
+                break;
+            case HAND:
+                equipment.setItemInMainHand(itemStack);
+                break;
+            case HEAD:
+                equipment.setHelmet(itemStack);
+                break;
+            case LEGS:
+                equipment.setLeggings(itemStack);
+                break;
+            case OFF_HAND:
+                equipment.setItemInOffHand(itemStack);
+                break;
         }
     }
 
-    public ItemStack getItemStack(EquipmentSlot slot)
-    {
-        if (equipment == null)
+    public ItemStack getItemStack(EquipmentSlot slot) {
+        if (equipment == null) {
             return null;
+        }
 
-        switch (slot)
-        {
-        case CHEST:
-            return equipment.getChestplate();
-        case FEET:
-            return equipment.getBoots();
-        case HAND:
-            return equipment.getItemInMainHand();
-        case HEAD:
-            return equipment.getHelmet();
-        case LEGS:
-            return equipment.getLeggings();
-        case OFF_HAND:
-            return equipment.getItemInOffHand();
+        switch (slot) {
+            case CHEST:
+                return equipment.getChestplate();
+            case FEET:
+                return equipment.getBoots();
+            case HAND:
+                return equipment.getItemInMainHand();
+            case HEAD:
+                return equipment.getHelmet();
+            case LEGS:
+                return equipment.getLeggings();
+            case OFF_HAND:
+                return equipment.getItemInOffHand();
         }
 
         return null;
     }
 
-    public void setRightClicking(boolean setRightClicking)
-    {
+    public void setRightClicking(boolean setRightClicking) {
         setEntityFlag(4, setRightClicking);
         sendData(0);
     }
 
-    public void setSneaking(boolean setSneaking)
-    {
+    public void setSneaking(boolean setSneaking) {
         setEntityFlag(1, setSneaking);
         sendData(0);
     }
 
-    public void setSprinting(boolean setSprinting)
-    {
+    public void setSprinting(boolean setSprinting) {
         setEntityFlag(3, setSprinting);
         sendData(0);
     }
 
-    protected void setValue(int id, Object value)
-    {
+    protected void setValue(int id, Object value) {
         entityValues.put(id, value);
 
-        if (!DisguiseConfig.isMetadataPacketsEnabled())
-        {
+        if (!DisguiseConfig.isMetadataPacketsEnabled()) {
             this.rebuildWatchableObjects();
         }
     }

@@ -17,6 +17,7 @@ public class WolfWatcher extends TameableWatcher {
 
     /**
      * Used for tail rotation.
+     *
      * @return
      */
     public float getDamageTaken() {
@@ -25,6 +26,7 @@ public class WolfWatcher extends TameableWatcher {
 
     /**
      * Used for tail rotation.
+     *
      * @param damage
      */
     public void setDamageTaken(float damage) {

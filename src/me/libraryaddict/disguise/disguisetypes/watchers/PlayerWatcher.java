@@ -43,7 +43,6 @@ public class PlayerWatcher extends LivingWatcher {
         return sleepingDirection;
     }
 
-
 //     Bit 0 (0x01): Cape enabled
 //     Bit 1 (0x02): Jacket enabled
 //     Bit 2 (0x04): Left Sleeve enabled
@@ -51,7 +50,6 @@ public class PlayerWatcher extends LivingWatcher {
 //     Bit 4 (0x10): Left Pants Leg enabled
 //     Bit 5 (0x20): Right Pants Leg enabled
 //     Bit 6 (0x40): Hat enabled
-
     private boolean isSkinFlag(int i) {
         return ((byte) getValue(12, (byte) 0) & 1 << i) != 0;
     }
@@ -119,7 +117,6 @@ public class PlayerWatcher extends LivingWatcher {
         sendData(12);
     }
 
-
     public boolean isSleeping() {
         return isInBed;
     }
@@ -141,7 +138,8 @@ public class PlayerWatcher extends LivingWatcher {
     }
 
     /**
-     * If no BlockFace is supplied. It grabs it from the entities facing direction if applicable.
+     * If no BlockFace is supplied. It grabs it from the entities facing
+     * direction if applicable.
      *
      * @param sleeping
      * @param sleepingDirection

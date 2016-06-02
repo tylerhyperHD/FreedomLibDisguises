@@ -13,14 +13,16 @@ public class GuardianWatcher extends LivingWatcher {
 
     /**
      * Is this guardian targetting someone?
+     *
      * @return
      */
     public boolean isTarget() {
-        return ((int)getValue(12, 0)) != 0;
+        return ((int) getValue(12, 0)) != 0;
     }
 
     /**
      * Shoot a beam at the given entityId.
+     *
      * @param entityId
      */
     public void setTarget(int entityId) {
@@ -30,11 +32,14 @@ public class GuardianWatcher extends LivingWatcher {
 
     /**
      * Shoot a beam at the given player name.
+     *
      * @param playername
      */
     public void setTarget(String playername) {
         Player player = Bukkit.getPlayer(playername);
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         setValue(12, player.getEntityId());
         sendData(12);
     }

@@ -9,32 +9,27 @@ import me.libraryaddict.disguise.disguisetypes.FlagWatcher;
 /**
  * @author Navid
  */
-public class EnderCrystalWatcher extends FlagWatcher
-{
-    public EnderCrystalWatcher(Disguise disguise)
-    {
+public class EnderCrystalWatcher extends FlagWatcher {
+
+    public EnderCrystalWatcher(Disguise disguise) {
         super(disguise);
     }
 
-    public void setBeamTarget(BlockPosition position)
-    {
+    public void setBeamTarget(BlockPosition position) {
         setValue(5, Optional.of(position));
         sendData(5);
     }
 
-    public Optional<BlockPosition> getBeamTarget()
-    {
+    public Optional<BlockPosition> getBeamTarget() {
         return (Optional) getValue(5, Optional.absent());
     }
 
-    public void setShowBottom(boolean bool)
-    {
+    public void setShowBottom(boolean bool) {
         setValue(6, bool);
         sendData(6);
     }
 
-    public boolean isShowBottom()
-    {
+    public boolean isShowBottom() {
         return (boolean) getValue(6, false);
     }
 

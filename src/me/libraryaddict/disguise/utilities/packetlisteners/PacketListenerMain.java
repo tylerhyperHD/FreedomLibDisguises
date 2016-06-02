@@ -19,25 +19,26 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import me.libraryaddict.disguise.LibsDisguises;
 import me.libraryaddict.disguise.utilities.PacketsManager;
 
-public class PacketListenerMain extends PacketAdapter
-{
+public class PacketListenerMain extends PacketAdapter {
+
     private LibsDisguises libsDisguises;
 
-    public PacketListenerMain(LibsDisguises plugin, ArrayList<PacketType> packetsToListen)
-    {
+    public PacketListenerMain(LibsDisguises plugin, ArrayList<PacketType> packetsToListen) {
         super(plugin, ListenerPriority.HIGH, packetsToListen);
 
         libsDisguises = plugin;
     }
 
     @Override
-    public void onPacketSending(PacketEvent event)
-    {
-        if (event.isCancelled())
+    public void onPacketSending(PacketEvent event) {
+        if (event.isCancelled()) {
             return;
+        }
 
         if (event.getPlayer().getName().contains("UNKNOWN[")) // If the player is temporary
+        {
             return;
+        }
 
         final Player observer = event.getPlayer();
 
@@ -48,52 +49,41 @@ public class PacketListenerMain extends PacketAdapter
 
         // If the entity is the same as the sender. Don't disguise!
         // Prevents problems and there is no advantage to be gained.
-        if (entity == observer)
+        if (entity == observer) {
             return;
+        }
 
         PacketContainer[][] packets = PacketsManager.transformPacket(event.getPacket(), event.getPlayer(), entity);
 
-        if (packets == null)
-        {
+        if (packets == null) {
             return;
         }
 
         event.setCancelled(true);
 
-        try
-        {
-            for (PacketContainer packet : packets[0])
-            {
+        try {
+            for (PacketContainer packet : packets[0]) {
                 ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet, false);
             }
 
             final PacketContainer[] delayed = packets[1];
 
-            if (delayed.length == 0)
-            {
+            if (delayed.length == 0) {
                 return;
             }
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(libsDisguises, new Runnable()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        for (PacketContainer packet : delayed)
-                        {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(libsDisguises, new Runnable() {
+                public void run() {
+                    try {
+                        for (PacketContainer packet : delayed) {
                             ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet, false);
                         }
-                    }
-                    catch (InvocationTargetException e)
-                    {
+                    } catch (InvocationTargetException e) {
                         e.printStackTrace();
                     }
                 }
             }, 2);
-        }
-        catch (InvocationTargetException ex)
-        {
+        } catch (InvocationTargetException ex) {
             ex.printStackTrace();
         }
 

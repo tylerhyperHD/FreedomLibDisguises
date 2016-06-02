@@ -24,10 +24,11 @@ public class ZombieWatcher extends LivingWatcher {
 
     /**
      * Is this zombie a villager?
+     *
      * @return
      */
     public boolean isVillager() {
-        return ((int)getValue(12, 0)) != 0;
+        return ((int) getValue(12, 0)) != 0;
     }
 
     public boolean isAggressive() {
@@ -35,8 +36,8 @@ public class ZombieWatcher extends LivingWatcher {
     }
 
     /**
-     * Only returns a valid value if this zombie
-     * is a villager.
+     * Only returns a valid value if this zombie is a villager.
+     *
      * @return
      */
     public Profession getProfession() {
@@ -62,8 +63,9 @@ public class ZombieWatcher extends LivingWatcher {
     }
 
     /**
-     * Sets the profession of this zombie, in turn
-     * turning it into a Zombie Villager
+     * Sets the profession of this zombie, in turn turning it into a Zombie
+     * Villager
+     *
      * @param id
      */
     public void setProfession(int id) {
@@ -72,8 +74,9 @@ public class ZombieWatcher extends LivingWatcher {
     }
 
     /**
-     * Sets the profession of this zombie, in turn
-     * turning it into a Zombie Villager
+     * Sets the profession of this zombie, in turn turning it into a Zombie
+     * Villager
+     *
      * @param profession
      */
     public void setProfession(Profession profession) {
