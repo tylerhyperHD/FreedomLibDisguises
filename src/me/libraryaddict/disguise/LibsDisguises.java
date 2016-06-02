@@ -24,7 +24,6 @@ import me.libraryaddict.disguise.commands.DisguiseViewSelf;
 import me.libraryaddict.disguise.commands.EntityDisguiseCommand;
 import me.libraryaddict.disguise.commands.HelpDisguiseCommand;
 import me.libraryaddict.disguise.commands.LibsDisguisesCommand;
-import me.libraryaddict.disguise.commands.PlayerDisguiseCommand;
 import me.libraryaddict.disguise.commands.RadiusDisguiseCommand;
 import me.libraryaddict.disguise.commands.UndisguiseCommand;
 import me.libraryaddict.disguise.commands.UndisguiseEntityCommand;
@@ -73,7 +72,6 @@ public class LibsDisguises extends JavaPlugin {
 
         getCommand("disguise").setExecutor(new DisguiseCommand());
         getCommand("undisguise").setExecutor(new UndisguiseCommand());
-        getCommand("disguiseplayer").setExecutor(new PlayerDisguiseCommand());
         getCommand("undisguiseplayer").setExecutor(new UndisguisePlayerCommand());
         getCommand("undisguiseentity").setExecutor(new UndisguiseEntityCommand());
         getCommand("disguiseentity").setExecutor(new EntityDisguiseCommand());
